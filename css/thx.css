@@ -1,0 +1,161 @@
+.child {
+    position: absolute;
+    top: 0px;
+    left: calc(50% - 275px);
+    background-color: #26324f;
+    border-bottom: 0.5px solid rgba(5, 9, 38, 0.28);
+    box-sizing: border-box;
+    width: 550px;
+    height: 57px;
+}
+
+.text {
+    position: absolute;
+    top: 0px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.text-wrapper {
+    position: absolute;
+    top: 0px;
+    width: 0px;
+    height: 23px;
+}
+
+.inner {
+    position: absolute;
+    top: 17px;
+    left: calc(50% - 0px);
+    width: 0px;
+    height: 23px;
+}
+
+.do-you-like {
+    margin: 0;
+}
+
+.do-you-like-container {
+    position: absolute;
+    top: 0px;
+    left: calc(50% - 216px);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.rate-your-expirience {
+    position: absolute;
+    top: 87px;
+    left: calc(50% - 145px);
+    font-size: 24px;
+    text-transform: uppercase;
+    font-weight: 300;
+}
+
+.do-you-like-creatinine-clearan-parent {
+    position: absolute;
+    top: 0px;
+    left: calc(50% - 216px);
+    width: 432px;
+    height: 117px;
+}
+
+.group-div {
+    position: absolute;
+    top: 120px;
+    left: calc(50% - 216px);
+    width: 432px;
+    height: 117px;
+    font-size: 30px;
+    color: #26324f;
+}
+
+.iconstar {
+    width: 32px;
+    position: relative;
+    height: 32px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.buttonrounded {
+    cursor: pointer;
+    border-radius: 40px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 8px;
+}
+
+.star-group {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 8px;
+}
+
+.star-rating {
+    position: absolute;
+    top: 300px;
+    left: calc(50% - 128px);
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.back-to-calculator {
+    position: relative;
+    line-height: 40px;
+}
+
+.back-to-calculator-wrapper {
+    position: absolute;
+    top: 0px;
+    left: calc(50% - 68px);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.divcalc-btn-sgue7 {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    background-color: #3b4c75;
+    width: 261px;
+    height: 40px;
+}
+
+.divcalc-btn-sgue7-wrapper {
+    position: absolute;
+    top: 444px;
+    right: 144px;
+    width: 261px;
+    height: 40px;
+    font-size: 16px;
+    color: #fff;
+    font-family: Inter;
+}
+
+.div {
+    width: 100%;
+    position: relative;
+    background-color: #f5f5f5;
+    height: 600px;
+    overflow: hidden;
+    text-align: center;
+    font-size: 14px;
+    color: #6b7888;
+    font-family: Inter;
+}
+
+body {
+    margin: 0;
+    line-height: normal;
+}

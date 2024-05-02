@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Creatinine clearance calc",
+  "version": "1.0",
+  "description": "This is a creatinine clearance calculator",
+  "permissions": [
+    "storage"
+  ],
+  "default_locale": "en",
+  "host_permissions": [
+    "*://*/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "./img/icons/extension/16x16.png",
+      "32": "./img/icons/extension/32x32.png",
+      "64": "./img/icons/extension/64x64.png",
+      "128": "./img/icons/extension/128x128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "128": "./img/icons/extension/128x128.png",
+    "16": "./img/icons/extension/16x16.png",
+    "32": "./img/icons/extension/32x32.png",
+    "64": "./img/icons/extension/64x64.png"
+  }
+}
