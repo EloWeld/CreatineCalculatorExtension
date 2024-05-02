@@ -1,5 +1,9 @@
 # Chrome Extension: Creatinine Calculator
 
+<p align="center">
+<img src="img/icons/extension/128x128.png" alt="Logo" width="100" height="100" style="display:center">
+</p>
+
 This Chrome extension provides a convenient calculator for estimating creatinine clearance using three different equations: Cockcroft-Gault Equation, MDRD GFR Equation, and 2021 CKD-EPI Creatinine-Cystatin C equation. 
 
 ## Features
