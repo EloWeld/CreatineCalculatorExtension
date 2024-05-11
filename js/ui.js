@@ -2,10 +2,12 @@
 let resultsCalculated = localStorage.getItem('calcResult');
 let starsClicked = localStorage.getItem('stars_clicked');
 
+
+
 export const state = {
     sex: null,
     race: null,
-    resultMode: "gault",
+    resultMode: localStorage.getItem('resultMode') || "gault",
     lastResult: null,
     has_result: false,
     lastResultsList: [],
@@ -16,6 +18,7 @@ export const state = {
 
 export const results_desc_text = document.getElementById("result-box");
 
+export const openFull = document.getElementById("openFull");
 
 // Constants for elements
 export const inputs = {

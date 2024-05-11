@@ -1,12 +1,12 @@
 import {
-    state, inputs, unitElements, modeButtons, rg_sex, sexButtons, rg_race, raceButtons, actionButtons, separators
+    state, inputs, openFull, unitElements, modeButtons, rg_sex, sexButtons, rg_race, raceButtons, actionButtons, separators
 } from "./ui.js";
 
-import {calcCreatineClearence, changeHasResult} from "./evidences.js";
+import { calcCreatineClearence, changeHasResult } from "./evidences.js";
 
 
 //———————————————————————————————————————————————————————————————————————————————————————— //
-//————————————————————————————————————   FUNCTIONS    ———————————————————————————————————— //
+//————————————————————————————————————      MODE      ———————————————————————————————————— //
 //———————————————————————————————————————————————————————————————————————————————————————— //
 function changeMode(result_mode, highlights = true) {
     state.lastResult = null;
@@ -38,10 +38,14 @@ function changeMode(result_mode, highlights = true) {
     }
 }
 
-function changeUnits(input, button, unitConfig) {
+//———————————————————————————————————————————————————————————————————————————————————————— //
+//————————————————————————————————————     UNITS      ———————————————————————————————————— //
+//———————————————————————————————————————————————————————————————————————————————————————— //
+
+function changeUnits(input, button, unitConfig, changeValues=true) {
     let currentValue = parseFloat(input.value);
     let newValue, newMin, newMax, newPlaceholder, toFixed;
-
+    console.log(unitConfig.currentUnit);
     // Переключение единиц измерения
     if (unitConfig.currentUnit === unitConfig.first.unit) {
         [unitConfig.currentUnit, newValue, newMin, newMax, newPlaceholder, toFixed] =
@@ -53,18 +57,20 @@ function changeUnits(input, button, unitConfig) {
 
     // Обновление атрибутов и значения элемента input
     input.setAttribute('placeholder', newPlaceholder);
-    if (input.value) {
+    if (input.value && changeValues) {
         input.value = newValue.toFixed(toFixed);
-        input.setAttribute('min', newMin);
-        input.setAttribute('max', newMax);
     }
+    input.setAttribute('min', newMin);
+    input.setAttribute('max', newMax);
 
     // Обновление текста на кнопке
     button.innerText = unitConfig.currentUnit;
+    button.value = unitConfig.currentUnit
 
     // Сохранение новой единицы измерения и пересчет значений
     evaluateResults();
     localStorage.setItem(button.id, unitConfig.currentUnit);
+    saveToLocalStorage();
 }
 
 // Конфигурация для переключения единиц измерения
@@ -76,15 +82,16 @@ const unitConfigs = {
     },
     height: {
         currentUnit: "cm",
-        first: { unit: "cm", conversion: 0.393701, range: [152, 213], placeholder: "152-213", toFixed: 1 },
-        second: { unit: "in", conversion: 2.54, range: [60, 84], placeholder: "60-84", toFixed: 0 }
+        first: { unit: "cm", conversion: 2.54, range: [152, 213], placeholder: "152-213", toFixed: 0 },
+        second: { unit: "in", conversion: 0.393701, range: [60, 84], placeholder: "60-84", toFixed: 2 }
     },
     creatinine: {
         currentUnit: "mg/dL",
-        first: { unit: "mg/dL", conversion: 88.4, range: [0.7, 1.3], placeholder: "0.7-1.3", toFixed: 0 },
-        second: { unit: "µmol/L", conversion: 0.0113122, range: [62, 115], placeholder: "62-115", toFixed: 3 }
+        first: { unit: "mg/dL", conversion: 1 / 88.4, range: [0.7, 1.3], placeholder: "0.7-1.3", toFixed: 3 },
+        second: { unit: "µmol/L", conversion: 88.4, range: [62, 115], placeholder: "62-115", toFixed: 2 }
     }
 };
+
 //———————————————————————————————————————————————————————————————————————————————————————— //
 //————————————————————————————————————    TOOLTIP     ———————————————————————————————————— //
 //———————————————————————————————————————————————————————————————————————————————————————— //
@@ -105,7 +112,7 @@ document.getElementById('black_question').addEventListener('mouseout', function 
 //———————————————————————————————————————————————————————————————————————————————————————— //
 // Copy result to clipboard
 function copyResultsToClipboard() {
-    const resultToCopy = inputs.resultsText.textContent;
+    const resultToCopy = state.currentResult;
     navigator.clipboard.writeText(resultToCopy).then(() => {
         console.log('Copying to clipboard was successful!');
     }, (err) => {
@@ -124,6 +131,8 @@ function copyResultsToClipboard() {
 function clearInputs() {
     document.querySelectorAll(".highlight").forEach(element => element.classList.remove("highlight"));
     Object.values(inputs).forEach(input => input.value = '');
+    rg_race.value = null;
+    rg_sex.value = null;
     Object.values(sexButtons).concat(Object.values(raceButtons)).forEach(button => button.classList.remove('segmented-unit-checked'));
     state.sex = null;
     state.race = null;
@@ -139,18 +148,51 @@ function clearInputs() {
 //———————————————————————————————————————————————————————————————————————————————————————— //
 //————————————————————————————————————   VALIDATIONS  ———————————————————————————————————— //
 //———————————————————————————————————————————————————————————————————————————————————————— //
-function validateNumberInput(event) {
+function validateNumberInput(event, key) {
+    let yellowZones = {
+        weight: [231, 281],
+        height: [204, 228],
+        age: [101, 120],
+        cystatin: [11, 30],
+        creatinine: [11, 40],
+    }
+    if (unitConfigs[key] !== undefined) {
+        if (unitElements[key].innerText !== unitConfigs[key].first.unit) {
+            yellowZones[key][0] *= unitConfigs[key].second.conversion
+            yellowZones[key][1] *= unitConfigs[key].second.conversion
+            
+        }
+    }
+    console.log(yellowZones[key])
+
     const input = event.target;
-    const value = parseFloat(input.value, 10);
+    const value = parseFloat(input.value, 10)
+
+    input.classList.remove("error");
+    input.classList.remove("small-error");
+    if (yellowZones[key] !== undefined) {
+        if (value >= yellowZones[key][0] && value <= yellowZones[key][1]) {
+            input.classList.add("small-error");
+
+        } else {
+            if (value > yellowZones[key][1] || value < 0.001) {
+                input.classList.add("error");
+            }
+
+        }
+    }
+
     const min = parseFloat(input.min);
     const max = parseFloat(input.max);
+}
 
-    if (min > value || value > max) {
-        input.classList.add("error");
-    } else {
-        input.classList.remove("error");
-    }
-    console.log(input, value, min, max);
+
+// Валидация ввода для полей с числовыми значениями
+function setupNumberInputValidation() {
+    Object.keys(inputs).forEach(key => {
+        inputs[key].addEventListener('input', (e) => validateNumberInput(e, key));
+        inputs[key].addEventListener('change', (e) => validateNumberInput(e, key));
+    });
 }
 
 function formChanged() {
@@ -168,8 +210,8 @@ function evaluateResults() {
 //———————————————————————————————————————————————————————————————————————————————————————— //
 //———————————————————————————————————— INITIALIZATION ———————————————————————————————————— //
 //———————————————————————————————————————————————————————————————————————————————————————— //
-// Jquery
 
+// Highlights
 $(document).on("mouseenter", ".highlight", function () {
     $(this).toggleClass("highlight");
 });
@@ -204,6 +246,7 @@ function setupEventListeners() {
     Object.values(modeButtons).forEach(button => {
         button.addEventListener('click', () => {
             state.resultMode = button.id.split('_')[2];
+            localStorage.setItem("resultMode", state.resultMode);
             changeMode(state.resultMode);
             formChanged();
         });
@@ -222,41 +265,40 @@ function setupEventListeners() {
     });
 }
 
-// Валидация ввода для полей с числовыми значениями
-function setupNumberInputValidation() {
-    document.querySelectorAll("input[type='number']").forEach(input => {
-        input.addEventListener('input', validateNumberInput);
-        input.addEventListener('change', validateNumberInput);
-    });
-}
-
-
 // Initialization from localStorage
 function initializeAppState() {
     state.sex = localStorage.getItem('sex');
     state.race = localStorage.getItem('race');
-
-    Object.keys(unitElements).forEach(key => {
-        let storedValue = localStorage.getItem(key + '_units');
-        if (storedValue) {
-            unitElements[key].textContent = storedValue;
-            unitElements[key].value = storedValue;
-        }
-    });
     Object.keys(inputs).forEach(key => {
-        console.log(key)
         let storedValue = localStorage.getItem(key);
         if (storedValue) {
             inputs[key].value = storedValue;
         }
     });
+
+    Object.keys(unitElements).forEach(key => {
+        let storedValue = localStorage.getItem(key + '_units');
+        if (storedValue) {
+            if (unitConfigs[key].currentUnit != storedValue) {
+                changeUnits(inputs[key], unitElements[key], unitConfigs[key], false);
+            }
+        }
+    });
+    Object.keys(modeButtons).forEach(key => {
+        if (key == state.resultMode) {
+            changeMode(key, false)
+        }
+    });
+
 }
 
 function initializeAfterListeners() {
-    if (state.sex)
+    if (state.sex != null && state.sex != "null") {
         sexButtons[state.sex].click()
-    if (state.race != null)
+    }
+    if (state.race != null && state.race != "null") {
         raceButtons[state.race].click()
+    }
 
 }
 
@@ -269,6 +311,29 @@ function saveToLocalStorage() {
     localStorage.setItem('race', state.race);
     localStorage.setItem('resultMode', state.resultMode);
 }
+
+
+function checkIfTabIsOpen (url, callback) {
+    chrome.tabs.query({}, function (tabs) {
+      console.log(tabs)
+      var isOpen = tabs.some(tab => tab.url === chrome.runtime.getURL(url))
+      callback(isOpen)
+    })
+  }
+
+checkIfTabIsOpen('popup.html', function (isOpen) {
+    console.log('asd', isOpen)
+if (isOpen) {
+    openFull.style.display = 'none'
+} else {
+    // Подключаем обработчик событий, если вкладка не открыта
+    openFull.addEventListener('click', function (e) {
+    chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') })
+    })
+}
+})
+  
+
 
 // Initialization of script
 function initialize() {

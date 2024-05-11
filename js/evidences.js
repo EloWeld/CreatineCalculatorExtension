@@ -1,55 +1,70 @@
 import { state, inputs, unitElements, results_desc_text, actionButtons } from "./ui.js"
 
 
+//———————————————————————————————————————————————————————————————————————————————————————— //
+//——————————————————————————————————— ON CHANGE RESULT ——————————————————————————————————— //
+//———————————————————————————————————————————————————————————————————————————————————————— //
 export function changeHasResult(newValue, d = null) {
-
     state.has_result = newValue;
-    if (state.has_result) {
-        actionButtons.copy.removeAttribute("disabled");
-    } else {
-        actionButtons.copy.setAttribute("disabled", "disabled");
-    }
+    actionButtons.copy.toggleAttribute("disabled", !newValue);
 
-    if (state.has_result) {
-        if (state.lastResult != newValue) {
-            if (state.lastResultsList.find((el) => el == d) == undefined) {
-                state.resultsCalculated++;
-                console.log(Date.now() - state.lastTimeStarsViewed)
-                if ((state.resultsCalculated % 5 == 0 || state.resultsCalculated == 1) && Date.now() - state.lastTimeStarsViewed > 1000 * 60) {
-                    setTimeout(() => {
-                        if (state.stars_clicked === "false") {
-                            location.href = "./thx_page.html";
-                            state.lastTimeStarsViewed = Date.now();
-                            localStorage.setItem("lastTimeStarsViewed", state.lastTimeStarsViewed.toString());
-                        }
-                    }, 5000)
-                }
-                console.log(state.resultsCalculated)
-                localStorage.setItem('calcResult', state.resultsCalculated);
-                state.lastResultsList.push(d);
-                if (state.lastResultsList.length > 50) {
-                    state.lastResultsList.pop(0);
-                }
-            }
+    if (newValue && state.lastResult !== newValue) {
+        const isNewResult = !state.lastResultsList.includes(d);
+        if (isNewResult) {
+            updateResultsList(d);
         }
-        state.lastResult = newValue;
     }
-
+    state.lastResult = newValue;
 }
 
+function updateResultsList(d) {
+    state.resultsCalculated++;
+    localStorage.setItem('calcResult', state.resultsCalculated);
+    state.lastResultsList.push(d);
+    if (state.lastResultsList.length > 50) {
+        state.lastResultsList.shift();
+    }
+    checkForSpecialEvent();
+}
+
+function checkForSpecialEvent() {
+    const resultsInterval = state.resultsCalculated % 5 === 0 || state.resultsCalculated === 1;
+    const timeInterval = Date.now() - state.lastTimeStarsViewed > 1000 * 60;
+    if (resultsInterval && timeInterval && state.starsClicked === "false") {
+        setTimeout(() => {
+            location.href = "./thx_page.html";
+            state.lastTimeStarsViewed = Date.now();
+            localStorage.setItem("lastTimeStarsViewed", state.lastTimeStarsViewed.toString());
+        }, 5000);
+    }
+}
+
+function noFields() {
+    changeHasResult(false);
+    document.getElementById("result-box").innerHTML = `<div>
+        <div class="result">Result:</div>
+        <div class="please-fill-out">Please fill out required fields.</div>
+    </div>`;
+}
+
+// Collecting form data
 function collectFormData() {
     return {
         sex: state.sex,
-        black_race: state.race,
-        weight: parseFloat(inputs.weight.value) * (unitElements.weight.getAttribute("value") === "kg" ? 1 : 0.45359237),
-        height: parseFloat(inputs.height.value) * (unitElements.height.getAttribute("value") === "cm" ? 1 : 2.54),
-        creatinine: parseFloat(inputs.creatinine.value) * (unitElements.creatinine.getAttribute("value") === "mg/dL" ? 1 : 1 / 88.4),
+        black_race: state.race == 'null' ? null : state.race,
+        weight: parseFloat(inputs.weight.value) * (unitElements.weight.innerText === "kg" ? 1 : 0.45359237),
+        height: parseFloat(inputs.height.value) * (unitElements.height.innerText === "cm" ? 1 : 2.54),
+        creatinine: parseFloat(inputs.creatinine.value) * (unitElements.creatinine.innerText === "mg/dL" ? 1 : 1 / 88.4),
         cystatin: parseFloat(inputs.cystatin.value),
         age: parseFloat(inputs.age.value)
     };
 }
 
 
+
+//———————————————————————————————————————————————————————————————————————————————————————— //
+//———————————————————————————————————————— GAULT ———————————————————————————————————————— //
+//———————————————————————————————————————————————————————————————————————————————————————— //
 function calculateGault(formdata) {
 
     let sexMultiplier = formdata.sex === "female" ? 0.85 : 1;
@@ -57,58 +72,83 @@ function calculateGault(formdata) {
     let ibw = formdata['sex'] === "male" ? 50 + (2.3 * (heightInches - 60)) : 45.5 + (2.3 * (heightInches - 60));
     let abw = ibw + 0.4 * (formdata['weight'] - ibw);
     let bmi = formdata['weight'] / (Math.pow(formdata['height'] / 100, 2));
-    let weightUsed = (bmi >= 18.5 && bmi <= 24.9) ? ibw : formdata.weight;
+    let useIbw = bmi >= 18.5 && bmi <= 24.9;
+    let using = `using adjusted body weight of ${Math.round(abw)} kg (${Math.round(abw * 1 / 0.45)} lbs)`
+    if (useIbw) {
+        let tmp = abw;
+        abw = ibw;
+        ibw = tmp;
+        using = `using idel body weight of ${Math.round(ibw)} kg (${Math.round(ibw * 1 / 0.45)} lbs)`
+    }
 
-    let crCl = (140 - formdata['age']) * weightUsed * sexMultiplier / (72 * formdata['creatinine']);
-    results_desc_text.innerHTML = `<div class="point"><h2>${Math.round(crCl)}<small class="ss">mL/min</small></h2><div style="font-size: 12px;">Creatinine clearance, adjusted Cockcroft-Gault</div></div>`;
+
+
+
+    let crcl_actual_weight = ((140 - formdata['age']) * formdata.weight * sexMultiplier) / (72 * formdata['creatinine'])
+    let crcl_ibw = ((140 - formdata['age']) * ibw * sexMultiplier) / (72 * formdata['creatinine'])
+    let crcl_abw = ((140 - formdata['age']) * abw * sexMultiplier) / (72 * formdata['creatinine'])
+
+    // console.log(bmi, crCl, formdata['age'], weightUsed, formdata['creatinine'], sexMultiplier)
+
+    results_desc_text.innerHTML = `<div class="point"><h2>${Math.round(crcl_actual_weight)}<small class="ss">mL/min/1.73 m²</small></h2><div style="font-size: 10px;">Creatinine clearance, adjusted Cockcroft-Gault</div></div>`;
     let bmi_case = "";
 
-    if (bmi >= 25) {
-        let crCl2 = (140 - formdata['age']) * abw * sexMultiplier / (72 * formdata['creatinine']);
+    if (bmi >= 18.5) {
         results_desc_text.innerHTML += "<div class='seppep'></div>";
-        results_desc_text.innerHTML += `<div class="point"><h2>${Math.round(crCl2)}<small class="ss">mL/min</small></h2><div style="font-size: 12px;">Creatinine clearance modified for overweight patient, using adjusted body weight of ${Math.round(abw)} kg (${Math.round(abw * 2.54)} lbs).</div></div>`;
+        results_desc_text.innerHTML += `<div class="point"><h2>${Math.round(crcl_abw)}<small class="ss">mL/min/1.73 m²</small></h2><div style="font-size: 10px;">Creatinine clearance modified for overweight patient, ${using}</div></div>`;
         results_desc_text.innerHTML += "<div class='seppep'></div>";
 
-        let crCl3 = (140 - formdata['age']) * ibw * sexMultiplier / (72 * formdata['creatinine']);
-        let crCl4 = (140 - formdata['age']) * abw * sexMultiplier / (72 * formdata['creatinine']);
-        results_desc_text.innerHTML += `<div class="point"><h2>${(crCl3).toFixed(1)} — ${(crCl4).toFixed(1)}<small class="ss">mL/min</small></h2><div style="font-size: 12px;">Note: This range uses IBW and adjusted body weight. Controversy exists over which form of weight to use.</div></div>`;
+        results_desc_text.innerHTML += `<div class="point"><h2>${(crcl_ibw).toFixed(1)} — ${(crcl_abw).toFixed(1)}<small class="ss">mL/min/1.73 m²</small></h2><div style="font-size: 10px;">Note: This range uses IBW and adjusted body weight. Controversy exists over which form of weight to use.</div></div>`;
 
         bmi_case = `
-${Math.round(crCl)} mL/min
-Creatinine clearance modified for overweight patient, using adjusted body weight of ${Math.round(abw)} kg (${Math.round(abw * 2.54)} lbs).
+${Math.round(crcl_abw)} mL/min/1.73 m²
+Creatinine clearance modified for overweight patient, ${using}.
 
-${(crCl3).toFixed(1)} — ${(crCl4).toFixed(1)} mL/min
+${(crcl_ibw).toFixed(1)} — ${(crcl_abw).toFixed(1)} mL/min/1.73 m²
 Note: This range uses IBW and adjusted body weight. Controversy exists over which form of weight to use.`;
     }
-    changeHasResult(state.resultMode, crCl);
+
+    changeHasResult(state.resultMode, crcl_actual_weight);
     state.currentResult = `RESULT SUMMARY:
-${Math.round(crCl)} mL/min
+${Math.round(crcl_actual_weight)} mL/min/1.73 m²
 Creatinine clearance, adjusted Cockcroft-Gault
 ${bmi_case}
 
 INPUTS:
 Sex —> ${formdata['sex']}
 Age —> ${formdata['age']} years
-Weight —> ${formdata['weight']} ${unitElements.weight.value}
-Height —> ${formdata['height'] != NaN ? formdata['height'] : '?'} ${unitElements.height.value}
-Serum creatinine —> ${formdata['creatinine']} ${unitElements.creatinine.value}`;
+Weight —> ${inputs.weight.value} ${unitElements.weight.innerText}
+Serum creatinine —> ${inputs.creatinine.value} ${unitElements.creatinine.innerText}`;
+if (inputs.height.value) {
+    state.currentResult += `
+Height —> ${inputs.height.value} ${unitElements.height.innerText}`
+}
 }
 
+
+//———————————————————————————————————————————————————————————————————————————————————————— //
+//———————————————————————————————————————— MDRD ———————————————————————————————————————— //
+//———————————————————————————————————————————————————————————————————————————————————————— //
 function calculateMDRD(formdata) {
-    let f = (formdata['sex'] === "female") ? 0.742 : 1;
-    let b = (formdata['black_race'] === "yes") ? 1.21 : 1;
-    let v1 = 175 * Math.pow(formdata['creatinine'], -1.154) * Math.pow(formdata['age'], -0.203) * f * b;
+    console.log(formdata)
+    const creatinine = formdata.creatinine
+    const age = parseInt(formdata.age, 10);
+    const isFemale = formdata.sex === "female";
+    const isBlack = formdata.black_race === "yes";
+
+    const genderFactor = isFemale ? 0.742 : 1;
+    
+    let result1 = 175 * Math.pow(creatinine, -1.154) * Math.pow(age, -0.203) * genderFactor * 1;
+    let result2 = 175 * Math.pow(creatinine, -1.154) * Math.pow(age, -0.203) * genderFactor * 1.212;
+
     let r;
     if (formdata['black_race'] === null) {
-        let b1 = 1;
-        let b2 = 1.21;
-        let v2 = v1 * b2 / b1;
-        r = v1.toFixed(1) + "-" + v2.toFixed(1);
+        r = result1.toFixed(1) + "-" + result2.toFixed(1);
     } else {
-        r = v1.toFixed(1);
+        r = (isBlack ? result2 : result1).toFixed(1);
     }
     results_desc_text.innerHTML = `<div class="point"><h2>${r}<small class="ss">mL/min/1.73 m²</small></h2><div>Glomerular Filtration Rate</div><div>by the MDRD Equation</div></div>`;
-    changeHasResult(state.resultMode, v1);
+    changeHasResult(state.resultMode, result1);
     state.currentResult = `RESULT SUMMARY:
 ${r} mL/min/1.73 m²
 Glomerular Filtration Rate by the MDRD Equation
@@ -117,9 +157,13 @@ INPUTS:
 Sex —> ${formdata['sex']}
 Black race —> ${formdata['black_race'] == null ? "?" : formdata['black_race']}
 Age —> ${formdata['age']} years
-Serum creatinine —> ${formdata['creatinine']} ${unitElements.creatinine.value}`;
+Serum creatinine —> ${inputs.creatinine.value} ${unitElements.creatinine.innerText}`;
 }
 
+
+//———————————————————————————————————————————————————————————————————————————————————————— //
+//———————————————————————————————————————— CKD ———————————————————————————————————————— //
+//———————————————————————————————————————————————————————————————————————————————————————— //
 function calculateCKD(formdata) {
 
     function determineCKDStage(eGFR) {
@@ -134,70 +178,110 @@ function calculateCKD(formdata) {
         } else if (eGFR >= 15) {
             return "Stage IV";
         } else {
-            return "Stage IV";
+            return "Stage V";
         }
     }
 
-    // Constants for the CKD-EPI Creatinine-Cystatin C 2021 equation
     let scr = formdata['creatinine'];
-    let scys = formdata['cystatin'];
+    let age = formdata['age'];
     let f = 1;
-    if (formdata['sex'] === "female") {
-        f = 0.963;
-    }
+    let ckd = null;
+    let mode = "";
+    if (isNaN(formdata['cystatin'])) {
+        // If without cystatin so only creatinine
+        mode = "2021 CKD-EPI Creatinine";
+        if (formdata['sex'] === "female") {
+            f = 1.012;
+        }
+        let scrThreshold = formdata['sex'] === 'female' ? 0.7 : 0.9;
+        let A = formdata['sex'] === 'female' ? 0.7 : 0.9;
+        let B = 0;
 
-    let scrThreshold = formdata['sex'] === 'female' ? 0.7 : 0.9;
-    let A = formdata['sex'] === 'female' ? 0.7 : 0.9;
-    let C = 0.8;
-    let B = 0;
-    let D = 0;
-
-    if (scys <= 0.8) {
-        B = scr <= scrThreshold ? -0.219 : -0.544;
-        D = -0.323;
+        if (scr <= 0.7) {
+            B = formdata['sex'] === 'female' ? -0.241 : -0.302;
+        } else {
+            B = -1.2;
+        }
+        ckd = 142 * Math.pow(scr / A, B) * Math.pow(0.9938, age) * f
+        // 142 x (Scr/A)B x 0.9938age x (1.012 if female), where A and B are the following:
     } else {
-        B = scr <= scrThreshold ? -0.219 : -0.544;
-        D = -0.778;
+        // Constants for the CKD-EPI Creatinine-Cystatin C 2021 equation
+        mode = "2021 CKD-EPI Creatinine-Cystatin C";
+        let scrThreshold = formdata['sex'] === 'female' ? 0.7 : 0.9;
+        let A = 0;
+        let age = formdata['age'];
+        let scys = formdata['cystatin'];
+        let scr = formdata['creatinine'];
+        let f = 1;
+        if (formdata['sex'] === "female") {
+            f = 0.963;
+            A = 0.7;
+        } else {
+            A = 0.9;
+        }
+        scrThreshold = A;
+        let C = 0.8;
+        let B = 0;
+        let D = 0;
+
+        if (scr <= scrThreshold) {
+            if (scys <= 0.8) {
+                B = -0.144;
+                D = -0.323;
+                console.log('a')
+            } else {
+                B = -0.144;
+                D = -0.778;
+                console.log('b')
+            }
+        } else {
+            B = -0.544;
+            if (scys <= 0.8) {
+                D = -0.323;
+                console.log('c')
+            } else {
+                D = -0.778;
+                console.log('d')
+            }
+        }
+
+        ckd = 135 * Math.pow((scr / A), B) * Math.pow((scys / C), D) * Math.pow(0.9961, age) * f;
+
     }
-
-    let g = 135 * Math.pow((scr / A), B) * Math.pow((scys / C), D) * Math.pow(0.9961, formdata['age']) * f;
-
     // Output the results
-    results_desc_text.innerHTML = `<div class="point"><h2>${Math.round(g)}<small class="ss">mL/min/1.73 m²</small></h2><div>Estimated GFR</div><div>2021 CKD-EPI Creatinine-Cystatin C</div></div>`;
+    results_desc_text.innerHTML = `<div class="point"><h2>${Math.round(ckd)}<small class="ss">mL/min/1.73 m²</small></h2><div>Estimated GFR</div><div>${mode}</div></div>`;
     results_desc_text.innerHTML += "<div class='seppep'></div>";
-    results_desc_text.innerHTML += `<div class="point"><h2>${determineCKDStage(g)}</h2><div>CKD stage by CKD-EPI Creatinine</div></div>`;
-    changeHasResult(state.resultMode, g);
+    results_desc_text.innerHTML += `<div class="point"><h2>${determineCKDStage(ckd)}</h2><div>CKD stage by CKD-EPI Creatinine</div></div>`;
+    changeHasResult(state.resultMode, ckd);
     state.currentResult = `RESULT SUMMARY:
-${Math.round(g)} mL/min/1.73 m²
-Estimated GFR by 2021 CKD-EPI Creatinine-Cystatin C
+${Math.round(ckd)} mL/min/1.73 m²
+Estimated GFR by ${mode}
 
-${determineCKDStage(g)} CKD stage by CKD-EPI Creatinine
+${determineCKDStage(ckd)} CKD stage by CKD-EPI Creatinine
 
 
 INPUTS:
 Sex —> ${formdata['sex']}
-Age —> ${formdata['age']}
-Serum creatinine —> ${formdata['creatinine']} ${unitElements.creatinine.value}
+Age —> ${age}
+Serum creatinine —> ${inputs.creatinine.value} ${unitElements.creatinine.innerText}`
+if (formdata['cystatin']) {
+    state.currentResult += `
 Serum cystatin C —> ${formdata['cystatin']} mg/L`;
+};
 
 }
-
-
-function noFields() {
-    changeHasResult(false);
-    document.getElementById("result-box").innerHTML = `<div>
-        <div class="result">Result:</div>
-        <div class="please-fill-out">Please fill out required fields.</div>
-    </div>`;
-}
+//———————————————————————————————————————————————————————————————————————————————————————— //
+//————————————————————————————————————————  BASE  ———————————————————————————————————————— //
+//———————————————————————————————————————————————————————————————————————————————————————— //
 
 export function calcCreatineClearence() {
     const formdata = collectFormData();
-    console.log(123);
 
+    let baseCondition = (formdata['sex'] != null) && !isNaN(formdata['age']) && !isNaN(formdata['creatinine']);
+    console.log(baseCondition)
     switch (state.resultMode) {
         case 'gault':
-            if (formdata['sex'] != null && !isNaN(formdata['weight']) && !isNaN(formdata['creatinine']) && !isNaN(formdata['age'])) {
+            if (baseCondition && !isNaN(formdata['weight'])) {
                 calculateGault(formdata);
 
             } else {
@@ -205,7 +289,7 @@ export function calcCreatineClearence() {
             }
             break;
         case 'mdrd':
-            if (formdata['sex'] != null && !isNaN(formdata['creatinine']) && !isNaN(formdata['age'])) {
+            if (baseCondition) {
                 calculateMDRD(formdata);
 
             } else {
@@ -213,7 +297,7 @@ export function calcCreatineClearence() {
             }
             break;
         case 'ckd':
-            if (formdata['sex'] != null && !isNaN(formdata['creatinine']) && !isNaN(formdata['cystatin']) && !isNaN(formdata['age'])) {
+            if (baseCondition) {
                 calculateCKD(formdata);
 
             } else {

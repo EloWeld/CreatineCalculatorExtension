@@ -309,6 +309,11 @@ input[type="number"]::-webkit-outer-spin-button {
     border: 1px solid red;
     background-color: #ffebeb !important;
 }
+.small-error {
+    border: 1px solid #ffe925;
+    background-color: #fffceb !important;
+}
+
 .error::after {
     content: "Value too low or too high";
     color: red;
@@ -366,6 +371,18 @@ input[type="number"] {
     padding-left: 5px;
     padding-right: 6px;
 
+}
+
+.uilexchange-parent-disabled {
+
+    border-left: 1px solid rgba(0, 0, 0, 0.15);
+    border-right: 1px solid transparent;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+
+    background-color: #ffffff !important;
+    cursor: default !important;
+    border: none !important;
 }
 
 .uilexchange-parent:hover {

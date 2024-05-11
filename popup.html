@@ -1,219 +1,286 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <meta charset="utf-8">
+  <head>
+    <meta charset="utf-8" />
     <title>Creatinine clearance calculator</title>
-    <link href="./css/style.css" rel='stylesheet' type="text/css">
+    <link href="./css/style.css" rel="stylesheet" type="text/css" />
 
-    <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1, width=device-width">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Calibri:wght@400&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, width=device-width" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@600&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Calibri:wght@400&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap"
+    />
+  </head>
 
-</head>
-
-<body style="
-overflow: hidden;
-">
-    <div style="
-    overflow: hidden;
-">
-        <div class="div">
-            <div class="child">
-            </div>
-            <div class="inner">
-                <div class="creatinine-clearance-calculato-wrapper">
-                    <div class="creatinine-clearance-calculato">creatinine clearance calculator</div>
-                </div>
-            </div>
-            <div class="group-parent">
-                <div class="background-wrapper">
-                    <div class="background">
-                        <div class="for-mdrd-gfr-container">
-                            <p class="for-mdrd-gfr">FOR MDRD GFR </p>
-                            <p class="for-mdrd-gfr">Equation</p>
-                        </div>
-                        <div class="head">
-                            <div class="black_race">Black race*</div>
-                            <div class="div1">*</div>
-                            <div class="question-circle">
-                            </div>
-                        </div>
-                        <div id="radio_group_black_race" class="segmented-control">
-                            <div id="radio_yes" class="segmented-unit-left segmented-unit">
-                                <div class="mgdl">Yes</div>
-                            </div>
-                            <div id="black_race_separator" class="separator"></div>
-                            <div id="radio_no" class="segmented-unit-right segmented-unit">
-                                <div class="mgdl">No</div>
-                            </div>
-                        </div>
-                        <div class="footer">
-                        </div>
-                        <img id="black_question" class="question-circle-icon" alt="" src="./img/question_circle.png">
-                        <div id="tooltip" style="display: none;">We balance the need for precise medical assessments
-                            with our responsibility to avoid racial biases, providing clinicians with tools that respect
-                            patient diversity.
-                        </div>
-                    </div>
-                </div>
-                <div class="background1">
-                    <div class="form-input-wrapper">
-                        <div class="form-input">
-                            <div class="head1">
-                                <div class="black_race">Serum cystatin C*</div>
-                            </div>
-                            <div class="body" style="width:343px">
-                                <input id="serum_cystatin_input" tabindex="5" type="number" class="value1" min="0.51" max="0.98"
-                                    placeholder="0.51-0.98">
-
-                                <div class="uilexchange-parent">
-
-                                    <div id="serum_cystatin_units" value="mg/dL" class="mgdl">mg/dL</div>
-                                </div>
-                                <span class="error-message" style="display:none; color: red;">Value too low or too
-                                    high</span>
-                            </div>
-                            <div class="footer1">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="for-2021-ckd-epi">FOR 2021 CKD-EPI Creatinine-Cystatin C</div>
-                </div>
-                <div class="background2">
-                    <div class="only-needed-to-calculate-gfr-f-wrapper">
-                        <div class="only-needed-to">Only needed to calculate GFR for children and creatinine clearance
-                            using
-                            the Cockcroft-Gault formula.</div>
-                    </div>
-                    <div class="form-input-frame">
-                        <div class="form-input4">
-                            <div class="head1">
-                                <div class="black_race">Weight*</div>
-                            </div>
-                            <div class="body" style="width:162px">
-                                <input id="weight_input" tabindex="3" type="number" class="value1" placeholder="1-150" min="1" max="150">
-
-                                <div class="uilexchange-parent">
-
-                                    <div id="weight_units" value="kg" class="mgdl-option">kg</div>
-                                </div>
-                            </div>
-                            <div class="footer1">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="group-div">
-                        <div class="form-input4">
-                            <div class="head1">
-                                <div class="black_race">Height*</div>
-                            </div>
-                            <div class="body" style="width:160px">
-                                <input id="height_input" tabindex="4" type="number" class="value1"
-                                    placeholder="152-213" min="152" max="213">
-
-                                <div class="uilexchange-parent">
-
-                                    <div id="height_units" value="cm" class="mgdl-option">cm</div>
-                                </div>
-                            </div>
-                            <div class="footer1">
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="form-input-container">
-                    <div class="form-input1">
-                        <div class="head1">
-                            <div class="black_race">Serum creatinine</div>
-                        </div>
-                        <div class="body" style="width:162px">
-                            <input id="serum_creatinine_input" tabindex="1" type="number" class="value1"
-                                placeholder="0.7-1.3" min="0.7" max="1.3">
-
-                            <div class="uilexchange-parent">
-
-                                <div id="creatinine_units" value="mg/dL" class="mgdl-option">mg/dL</div>
-                            </div>
-                        </div>
-                        <div class="footer1">
-                        </div>
-                    </div>
-                </div>
-                <div class="form-input-parent">
-                    <div class="form-input2">
-                        <div class="head1">
-                            <div class="black_race">Age</div>
-                        </div>
-                        <div class="body" style="width: 162px;">
-                            <input id="age_input" tabindex="2" type="number" class="value2" placeholder="Years old"  min="1" max="200">
-                        </div>
-                        <div class="footer1">
-                        </div>
-                    </div>
-                    <div class="group-child">
-                    </div>
-                </div>
-                <div class="form-input3">
-                    <div class="head1">
-                        <div class="black_race">Sex</div>
-                    </div>
-                    <div id="radio_group_sex" class="segmented-control1">
-                        <div id="radio_female" class="segmented-unit-left segmented-unit">
-                            <div class="mgdl">Female</div>
-                        </div>
-                        <div id="sex_separator" class="separator"></div>
-                        <div id="radio_male" class="segmented-unit-right segmented-unit">
-                            <div class="mgdl">Male</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="segmented-control2">
-                    <div id="radio_mode_gault" class="segmented-unit segmented-unit-checked">
-                        <div class="mgdl">Cockcroft-Gault</div>
-                    </div>
-                    <div id="mode_separator1" class="separator" style="display: none;"></div>
-                    <div id="radio_mode_mdrd" class="segmented-unit segmented-unit-left">
-                        <div class="mgdl">MDRD GFR </div>
-                    </div>
-                    <div id="mode_separator2" class="separator"></div>
-                    <div id="radio_mode_ckd" class="segmented-unit segmented-unit-right">
-                        <div class="mgdl">CKD-EPI</div>
-                    </div>
-                </div>
-                <div class="rectangle-wrapper">
-                    <div id="result-box" class="group-item">
-                        <div>
-                            <div class="result">Result:</div>
-                            <div class="please-fill-out">Please fill out required fields.</div>
-                        </div>
-                    </div>
-                </div>
-                <div id="clear_results_btn" class="mybtn clear-results-btn">
-                    <div class="clear-results-parent">
-                        <div class="clear-results">Clear results</div>
-                        <img class="uilexchange-icon" alt="" src="./img/iconamoon_restart.svg">
-                    </div>
-                </div>
-                <button disabled id="copy_results_btn" class="mybtn copy-results-btn">
-                    <div class="clear-results-parent">
-                        <div class="clear-results">Copy results</div>
-                        <img class="uilexchange-icon" alt="" src="./img/bi_copy.svg">
-                    </div>
-                </button>
+  <body style="overflow: hidden">
+    <div style="overflow: hidden">
+      <div class="div">
+        <div class="child"></div>
+        <div class="inner">
+          <div class="creatinine-clearance-calculato-wrapper">
+            <div class="creatinine-clearance-calculato">
+              creatinine clearance calculator
             </div>
 
-
-
+            <img
+                id="openFull"
+              style="position: absolute; left: 380px; width: 15px; height: 15px; cursor: pointer; top: 3px"
+              alt=""
+              src="./img/up-right-from-square-solid.svg"
+            />
+          </div>
         </div>
+        <div class="group-parent">
+          <div class="background-wrapper">
+            <div class="background">
+              <div class="for-mdrd-gfr-container">
+                <p class="for-mdrd-gfr">FOR MDRD GFR</p>
+                <p class="for-mdrd-gfr">Equation</p>
+              </div>
+              <div class="head">
+                <div class="black_race">Black race*</div>
+                <div class="div1">*</div>
+                <div class="question-circle"></div>
+              </div>
+              <div id="radio_group_black_race" class="segmented-control">
+                <div id="radio_yes" class="segmented-unit-left segmented-unit">
+                  <div class="mgdl">Yes</div>
+                </div>
+                <div id="black_race_separator" class="separator"></div>
+                <div id="radio_no" class="segmented-unit-right segmented-unit">
+                  <div class="mgdl">No</div>
+                </div>
+              </div>
+              <div class="footer"></div>
+              <img
+                id="black_question"
+                class="question-circle-icon"
+                alt=""
+                src="./img/question_circle.png"
+              />
+              <div id="tooltip" style="display: none">
+                We balance the need for precise medical assessments with our
+                responsibility to avoid racial biases, providing clinicians with
+                tools that respect patient diversity.
+              </div>
+            </div>
+          </div>
+          <div class="background1">
+            <div class="form-input-wrapper">
+              <div class="form-input">
+                <div class="head1">
+                  <div class="black_race">Serum cystatin C*</div>
+                </div>
+                <div class="body" style="width: 343px">
+                  <input
+                    id="serum_cystatin_input"
+                    tabindex="5"
+                    type="number"
+                    class="value1"
+                    min="0.51"
+                    max="0.98"
+                    placeholder="0.51-0.98"
+                  />
+
+                  <div class="uilexchange-parent uilexchange-parent-disabled">
+                    <div id="serum_cystatin_units" value="mg/dL" class="mgdl">
+                      mg/dL
+                    </div>
+                  </div>
+                  <span class="error-message" style="display: none; color: red"
+                    >Value too low or too high</span
+                  >
+                </div>
+                <div class="footer1"></div>
+              </div>
+            </div>
+            <div class="for-2021-ckd-epi">
+              FOR 2021 CKD-EPI Creatinine-Cystatin C
+            </div>
+          </div>
+          <div class="background2">
+            <div class="only-needed-to-calculate-gfr-f-wrapper">
+              <div class="only-needed-to">
+                Only needed to calculate GFR for children and creatinine
+                clearance using the Cockcroft-Gault formula.
+              </div>
+            </div>
+            <div class="form-input-frame">
+              <div class="form-input4">
+                <div class="head1">
+                  <div class="black_race">Weight*</div>
+                </div>
+                <div class="body" style="width: 162px">
+                  <input
+                    id="weight_input"
+                    tabindex="3"
+                    type="number"
+                    class="value1"
+                    placeholder="1-150"
+                    min="1"
+                    max="150"
+                  />
+
+                  <div class="uilexchange-parent">
+                    <div id="weight_units" value="kg" class="mgdl-option">
+                      kg
+                    </div>
+                  </div>
+                </div>
+                <div class="footer1"></div>
+              </div>
+            </div>
+            <div class="group-div">
+              <div class="form-input4">
+                <div class="head1">
+                  <div class="black_race">Height*</div>
+                </div>
+                <div class="body" style="width: 160px">
+                  <input
+                    id="height_input"
+                    tabindex="4"
+                    type="number"
+                    class="value1"
+                    placeholder="152-213"
+                    min="152"
+                    max="213"
+                  />
+
+                  <div class="uilexchange-parent">
+                    <div id="height_units" value="cm" class="mgdl-option">
+                      cm
+                    </div>
+                  </div>
+                </div>
+                <div class="footer1"></div>
+              </div>
+            </div>
+          </div>
+          <div class="form-input-container">
+            <div class="form-input1">
+              <div class="head1">
+                <div class="black_race">Serum creatinine</div>
+              </div>
+              <div class="body" style="width: 162px">
+                <input
+                  id="serum_creatinine_input"
+                  tabindex="1"
+                  type="number"
+                  class="value1"
+                  placeholder="0.7-1.3"
+                  min="0.7"
+                  max="1.3"
+                />
+
+                <div class="uilexchange-parent">
+                  <div id="creatinine_units" value="mg/dL" class="mgdl-option">
+                    mg/dL
+                  </div>
+                </div>
+              </div>
+              <div class="footer1"></div>
+            </div>
+          </div>
+          <div class="form-input-parent">
+            <div class="form-input2">
+              <div class="head1">
+                <div class="black_race">Age</div>
+              </div>
+              <div class="body" style="width: 162px">
+                <input
+                  id="age_input"
+                  tabindex="2"
+                  type="number"
+                  class="value2"
+                  placeholder="Years old"
+                  min="1"
+                  max="200"
+                />
+              </div>
+              <div class="footer1"></div>
+            </div>
+            <div class="group-child"></div>
+          </div>
+          <div class="form-input3">
+            <div class="head1">
+              <div class="black_race">Sex</div>
+            </div>
+            <div id="radio_group_sex" class="segmented-control1">
+              <div id="radio_female" class="segmented-unit-left segmented-unit">
+                <div class="mgdl">Female</div>
+              </div>
+              <div id="sex_separator" class="separator"></div>
+              <div id="radio_male" class="segmented-unit-right segmented-unit">
+                <div class="mgdl">Male</div>
+              </div>
+            </div>
+          </div>
+          <div class="segmented-control2">
+            <div
+              id="radio_mode_gault"
+              class="segmented-unit segmented-unit-checked"
+            >
+              <div class="mgdl">Cockcroft-Gault</div>
+            </div>
+            <div
+              id="mode_separator1"
+              class="separator"
+              style="display: none"
+            ></div>
+            <div
+              id="radio_mode_mdrd"
+              class="segmented-unit segmented-unit-left"
+            >
+              <div class="mgdl">MDRD GFR</div>
+            </div>
+            <div id="mode_separator2" class="separator"></div>
+            <div
+              id="radio_mode_ckd"
+              class="segmented-unit segmented-unit-right"
+            >
+              <div class="mgdl">CKD-EPI</div>
+            </div>
+          </div>
+          <div class="rectangle-wrapper">
+            <div id="result-box" class="group-item">
+              <div>
+                <div class="result">Result:</div>
+                <div class="please-fill-out">
+                  Please fill out required fields.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="clear_results_btn" class="mybtn clear-results-btn">
+            <div class="clear-results-parent">
+              <div class="clear-results">Clear results</div>
+              <img
+                class="uilexchange-icon"
+                alt=""
+                src="./img/iconamoon_restart.svg"
+              />
+            </div>
+          </div>
+          <button disabled id="copy_results_btn" class="mybtn copy-results-btn">
+            <div class="clear-results-parent">
+              <div class="clear-results">Copy results</div>
+              <img class="uilexchange-icon" alt="" src="./img/bi_copy.svg" />
+            </div>
+          </button>
+        </div>
+      </div>
     </div>
     <div id="popupContent"></div>
     <script src="./thirdParty/jquery-3.7.1.min.js"></script>
     <script type="module" src="./js/popup.js"></script>
-
-</body>
-
+  </body>
 </html>

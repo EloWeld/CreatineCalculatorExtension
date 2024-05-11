@@ -4,7 +4,8 @@
   "version": "1.0",
   "description": "This is a creatinine clearance calculator",
   "permissions": [
-    "storage"
+    "storage",
+    "tabs"
   ],
   "default_locale": "en",
   "host_permissions": [
