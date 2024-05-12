@@ -4,6 +4,24 @@ import {
 
 import { calcCreatineClearence, changeHasResult } from "./evidences.js";
 
+chrome.tabs.getCurrent(function(tab) {
+    if (tab) {
+        // Это означает, что код выполняется в контексте вкладки
+        document.querySelector('body').style.margin = "0 auto";
+        document.querySelector('body').style.marginTop = "5vh";
+        document.querySelector('body').style.background = "linear-gradient(to end, #00e6e6, #ff00ff)";
+        document.querySelector('.bodyframe').style.borderRadius = "10px";
+        document.querySelector('.bodyframe').style.border = "2px solid #26324f";
+        document.querySelector('.bodyframe').style.boxShadow = "-5px 5px 30px 10px rgba(0,0,0,0.3)";
+        openFull.style.display = 'none'
+    } else {
+        // Это означает, что код выполняется в всплывающем окне (popup)
+        // Здесь можно добавить код, который должен выполняться для всплывающего окна, если необходимо
+        openFull.addEventListener('click', function (e) {
+            chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') })
+        })
+    }
+});
 
 //———————————————————————————————————————————————————————————————————————————————————————— //
 //————————————————————————————————————      MODE      ———————————————————————————————————— //
@@ -312,27 +330,6 @@ function saveToLocalStorage() {
     localStorage.setItem('resultMode', state.resultMode);
 }
 
-
-function checkIfTabIsOpen (url, callback) {
-    chrome.tabs.query({}, function (tabs) {
-      console.log(tabs)
-      var isOpen = tabs.some(tab => tab.url === chrome.runtime.getURL(url))
-      callback(isOpen)
-    })
-  }
-
-checkIfTabIsOpen('popup.html', function (isOpen) {
-    console.log('asd', isOpen)
-if (isOpen) {
-    openFull.style.display = 'none'
-} else {
-    // Подключаем обработчик событий, если вкладка не открыта
-    openFull.addEventListener('click', function (e) {
-    chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') })
-    })
-}
-})
-  
 
 
 // Initialization of script
