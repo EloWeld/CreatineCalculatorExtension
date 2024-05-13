@@ -213,7 +213,8 @@ function calculateCKD(formdata) {
         let scys = formdata['cystatin'];
         let scr = formdata['creatinine'];
         let f = 1;
-        if (formdata['sex'] === "female") {
+        let isF = formdata['sex'] === "female";
+        if (isF) {
             f = 0.963;
             A = 0.7;
         } else {
@@ -226,11 +227,11 @@ function calculateCKD(formdata) {
 
         if (scr <= scrThreshold) {
             if (scys <= 0.8) {
-                B = -0.144;
+                B = isF ? -0.219 : -0.144;
                 D = -0.323;
                 console.log('a')
             } else {
-                B = -0.144;
+                B = isF ? -0.219 : -0.144;
                 D = -0.778;
                 console.log('b')
             }
@@ -244,6 +245,7 @@ function calculateCKD(formdata) {
                 console.log('d')
             }
         }
+        // console.log(A, B, C, D, f)
 
         ckd = 135 * Math.pow((scr / A), B) * Math.pow((scys / C), D) * Math.pow(0.9961, age) * f;
 
